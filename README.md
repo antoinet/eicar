@@ -11,6 +11,7 @@
 ## Analysis with Radare2
  * COM files entry point is fixed at 0100h: `$ r2 -m 0x100 eicar.txt`
  * Look at file information with `i`, see the length is 0x44 (68 bytes)
+ * Set block length to 0x44, accordingly: `> b 0x44`
  * Disassemble with `> pD`, it doesn't make any sense since...
  * switch to 16 bit: `> e asm.bits=16` and repeat: `> pD`, now it looks better
  * set two labels:
@@ -48,7 +49,9 @@ $ r2 -qi eicar.r2 -
             0000:0117      43             inc bx
             0000:0118      2937           sub word [bx], si
             0000:011a      7d24           jge 0x140
+            ;-- eicarstr:
             0000:011c     .string "EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$" ; len=36
+            ;-- end:
             0000:0140      48             dec ax
             0000:0141      2b482a         sub cx, word [bx + si + 0x2a]
 Searching 1 byte in [0x11d-0x200]
@@ -61,7 +64,7 @@ EICAR-STANDARD-ANTIVIRUS-TEST-FILE!
             0000:0100      58             pop ax                       ; ax=0x0 ; sp=0x283
             0000:0101      354f21         xor ax, 0x214f               ; ax=0x214f ; zf=0x0 ; pf=0x0 ; sf=0x0 ; cf=0x0 ; of=0x0
             0000:0104      50             push ax                      ; sp=0x281 sp
-            0000:0105      254041         and ax, 0x4140               ; ax=0x140 -> 0x20cd21cd ; zf=0x0 ; pf=0x0 ; sf=0x0 ; cf=0x0 ; of=0x0
+            0000:0105      254041         and ax, 0x4140               ; ax=0x140 -> 0x20cd21cd end ; zf=0x0 ; pf=0x0 ; sf=0x0 ; cf=0x0 ; of=0x0
             0000:0108      50             push ax                      ; sp=0x27f "{\t" bp
             0000:0109      5b             pop bx                       ; bx=0x97b si ; sp=0x281 sp
             0000:010a      345c           xor al, 0x5c                 ; al=0x1c ; zf=0x0 ; pf=0x0 ; sf=0x0 ; cf=0x0 ; of=0x0
@@ -76,8 +79,10 @@ EICAR-STANDARD-ANTIVIRUS-TEST-FILE!
             0000:0117      43             inc bx                       ; bx=0x97d ; of=0x0 ; sf=0x0 ; zf=0x0 ; pf=0x1 flags
             0000:0118      2937           sub word [bx], si            ; of=0x0 ; sf=0x1 flags ; zf=0x0 ; pf=0x1 flags ; cf=0x0
             0000:011a      7d24           jge 0x140                    ; unlikely
+            ;-- eicarstr:
             ;-- dx:
             0000:011c     .string "EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$" ; len=36
+            ;-- end:
             0000:0140      cd21           int 0x21                     ; 40 = unknown ()
             ;-- bx:
             0000:0142      cd20           int 0x20                     ; 40 = unknown ()
